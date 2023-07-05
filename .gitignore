@@ -1,3 +1,4 @@
 *.swp
 *.yaml
 goora_date_test
+trace.log

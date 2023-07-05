@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"goora_date_test/db"
 
 	"github.com/spf13/viper"
@@ -39,9 +37,8 @@ var (
 
 func main() {
 	dbc, err := db.FromViper(viper.Sub(*dbConfKey))
-	dbcx, err := db.SqlxFromViper(viper.Sub(*dbConfKey))
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 	defer func() {
 		err := dbc.Close()
@@ -49,17 +46,33 @@ func main() {
 			panic(fmt.Errorf("Failed to close connections: %w", err))
 		}
 	}()
+	dbcx, err := db.SqlxFromViper(viper.Sub(*dbConfKey))
+	if err != nil {
+		panic(err)
+	}
 	defer func() {
 		err := dbcx.Close()
 		if err != nil {
 			panic(fmt.Errorf("Failed to close connections: %w", err))
 		}
 	}()
+	gdbc, err := db.GodrorFromViper(viper.Sub(*dbConfKey))
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		err := gdbc.Close()
+		if err != nil {
+			panic(fmt.Errorf("Failed to close connections: %w", err))
+		}
+	}()
 
-	fmt.Print("sqlx:\n\n")
+	fmt.Print("sqlx go-ora:\n\n")
 	TestDbcX(dbcx)
-	fmt.Print("\nsql:\n\n")
+	fmt.Print("\ngo-ora:\n\n")
 	TestDbc(dbc)
+	fmt.Print("\ngodror:\n\n")
+	TestDbc(gdbc)
 }
 
 func TestDbc(dbc *db.Connection) {
@@ -95,8 +108,8 @@ func DumpJson(d any) {
 }
 
 func DumpTime(r TimeDebug) {
-	fmt.Printf("%16s: %s\n", "CurrentDate", r.TimeCurrentDate.Format(time.UnixDate))
-	fmt.Printf("%16s: %s\n", "CurrentTimestamp", r.TimeCurrentTimestamp.Format(time.UnixDate))
+	//fmt.Printf("%16s: %s\n", "CurrentDate", r.TimeCurrentDate.Format(time.UnixDate))
+	//fmt.Printf("%16s: %s\n", "CurrentTimestamp", r.TimeCurrentTimestamp.Format(time.UnixDate))
 	fmt.Printf("%16s: %s\n", "Sysdate", r.TimeSysdate.Format(time.UnixDate))
 	fmt.Printf("%16s: %s\n", "Systimestamp", r.TimeSystimestamp.Format(time.UnixDate))
 	fmt.Printf("%16s: %s\n", "Real Time", time.Now().Format(time.UnixDate))
