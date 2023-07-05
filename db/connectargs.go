@@ -60,7 +60,6 @@ func (args *ConnectArgs) GodrorConnectString() string {
 		args.Service,
 		opts,
 	)
-	fmt.Print(connStr + "\n")
 	return connStr
 }
 
